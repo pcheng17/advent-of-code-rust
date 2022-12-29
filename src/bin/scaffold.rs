@@ -17,9 +17,10 @@ pub fn part_two(input: &str) -> Option<u32> {
 }
 
 fn main() {
-    let input = &advent_of_code::read_file("inputs", DAY);
-    advent_of_code::solve!(1, part_one, input);
-    advent_of_code::solve!(2, part_two, input);
+    let input = advent_of_code::read_file("inputs", DAY);
+    // let parsed = advent_of_code::run_parser(parse, &input);
+    advent_of_code::solve!(1, part_one, &input);
+    advent_of_code::solve!(2, part_two, &input);
 }
 
 #[cfg(test)]

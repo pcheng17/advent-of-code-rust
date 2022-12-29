@@ -19,7 +19,7 @@ macro_rules! solve {
         use std::fmt::Display;
         use std::time::Instant;
 
-        fn print_result<I: Clone, T: Display>(func: impl FnOnce(I) -> Option<T>, input: I) {
+        fn print_result<I, T: Display>(func: impl FnOnce(I) -> Option<T>, input: I) {
             let timer = Instant::now();
             let result = func(input);
             let elapsed = timer.elapsed();
@@ -55,10 +55,7 @@ pub fn run_parser<T>(func: impl Fn(&str) -> T, input: &str) -> T {
 
 pub fn read_file(folder: &str, day: u8) -> String {
     let cwd = env::current_dir().unwrap();
-    let filepath = cwd
-        .join("src")
-        .join(folder)
-        .join(format!("{:02}.txt", day));
+    let filepath = cwd.join("src").join(folder).join(format!("{:02}.txt", day));
     let f = fs::read_to_string(filepath);
     f.expect("could not open input file")
 }
