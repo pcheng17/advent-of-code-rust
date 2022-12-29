@@ -65,8 +65,8 @@ fn main() {
 
     let day_padded = format!("{:02}", day);
 
-    let input_path = format!("src/inputs/{}.txt", day_padded);
-    let example_path = format!("src/examples/{}.txt", day_padded);
+    let input_path = format!("data/inputs/{}.txt", day_padded);
+    let example_path = format!("data/examples/{}.txt", day_padded);
     let module_path = format!("src/bin/{}.rs", day_padded);
 
     let mut file = match safe_create_file(&module_path) {
