@@ -19,7 +19,7 @@ macro_rules! solve {
         use std::fmt::Display;
         use std::time::Instant;
 
-        fn print_result<T: Display>(func: impl FnOnce(&str) -> Option<T>, input: &str) {
+        fn print_result<I: Clone, T: Display>(func: impl FnOnce(I) -> Option<T>, input: I) {
             let timer = Instant::now();
             let result = func(input);
             let elapsed = timer.elapsed();
@@ -27,7 +27,7 @@ macro_rules! solve {
                 Some(result) => {
                     println!(
                         "{} {}(elapsed: {:.2?}){}",
-                        result, ANSI_ITALIC, elapsed, ANSI_RESET
+                        result, ANSI_RESET, elapsed, ANSI_RESET
                     );
                 }
                 None => {
@@ -36,16 +36,29 @@ macro_rules! solve {
             }
         }
 
-        println!("🎄 {}Part {}{} 🎄", ANSI_BOLD, $part, ANSI_RESET);
+        print!("🎄 {}Part {}{}: ", ANSI_BOLD, $part, ANSI_RESET);
         print_result($solver, $input);
     }};
 }
 
+pub fn run_parser<T>(func: impl Fn(&str) -> T, input: &str) -> T {
+    fn print_result<T>(func: impl FnOnce(&str) -> T, input: &str) -> T {
+        let timer = std::time::Instant::now();
+        let result = func(input);
+        let elapsed = timer.elapsed();
+        println!("✓ (elapsed: {:.2?})", elapsed);
+        result
+    }
+    print!("🎄 {}Parser{}: ", ANSI_BOLD, ANSI_RESET);
+    print_result(func, input)
+}
+
 pub fn read_file(folder: &str, day: u8) -> String {
     let cwd = env::current_dir().unwrap();
-
-    let filepath = cwd.join("src").join(folder).join(format!("{:02}.txt", day));
-
+    let filepath = cwd
+        .join("src")
+        .join(folder)
+        .join(format!("{:02}.txt", day));
     let f = fs::read_to_string(filepath);
     f.expect("could not open input file")
 }
