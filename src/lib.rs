@@ -55,7 +55,7 @@ pub fn run_parser<T>(func: impl Fn(&str) -> T, input: &str) -> T {
 
 pub fn read_file(folder: &str, day: u8) -> String {
     let cwd = env::current_dir().unwrap();
-    let filepath = cwd.join("src").join(folder).join(format!("{:02}.txt", day));
+    let filepath = cwd.join("data").join(folder).join(format!("{:02}.txt", day));
     let f = fs::read_to_string(filepath);
     f.expect("could not open input file")
 }
@@ -71,7 +71,8 @@ pub fn parse_exec_time(output: &str) -> f64 {
         } else {
             let timing = l.split("(elapsed: ").last().unwrap();
             // use `contains` istd. of `ends_with`: string may contain ANSI escape sequences.
-            // for possible time formats, see: https://github.com/rust-lang/rust/blob/1.64.0/library/core/src/time.rs#L1176-L1200
+            // for possible time formats,
+            // see: https://github.com/rust-lang/rust/blob/1.64.0/library/core/src/time.rs#L1176-L1200
             if timing.contains("ns)") {
                 acc // range below rounding precision.
             } else if timing.contains("µs)") {
@@ -179,7 +180,7 @@ pub mod aoc_cli {
         let input_path = get_input_path(day);
 
         let puzzle_path = get_puzzle_path(day);
-        create_dir_all("src/puzzles").map_err(|_| AocCliError::IoError)?;
+        create_dir_all("data/puzzles").map_err(|_| AocCliError::IoError)?;
 
         let args = build_args(
             "download",
@@ -208,12 +209,12 @@ pub mod aoc_cli {
 
     fn get_input_path(day: u8) -> String {
         let day_padded = format!("{:02}", day);
-        format!("src/inputs/{}.txt", day_padded)
+        format!("data/inputs/{}.txt", day_padded)
     }
 
     fn get_puzzle_path(day: u8) -> String {
         let day_padded = format!("{:02}", day);
-        format!("src/puzzles/{}.md", day_padded)
+        format!("data/puzzles/{}.md", day_padded)
     }
 
     fn build_args(command: &str, args: &[String], day: u8, year: Option<u16>) -> Vec<String> {
