@@ -17,9 +17,9 @@ fn main() {
 
             let cmd = Command::new("cargo").args(&args).output().unwrap();
 
-            println!("----------");
-            println!("{}| Day {} |{}", ANSI_BOLD, day, ANSI_RESET);
-            println!("----------");
+            println!("+----------------------+");
+            println!("|        {}Day {}{}        |", ANSI_BOLD, day, ANSI_RESET);
+            println!("+----------------------+");
 
             let output = String::from_utf8(cmd.stdout).unwrap();
             let is_empty = output.is_empty();
@@ -43,6 +43,6 @@ fn main() {
 
     println!(
         "{}Total:{} {}{:.2}ms{}",
-        ANSI_BOLD, ANSI_RESET, ANSI_ITALIC, total, ANSI_RESET
+        ANSI_BOLD, ANSI_RESET, ANSI_RESET, total, ANSI_RESET
     );
 }
