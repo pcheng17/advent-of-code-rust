@@ -1,11 +1,24 @@
-pub fn part_one(input: &str) -> Option<u32> {
-    for line in input.split("\n") {
-        println!("{}", line);
-    }
+// use std::collections::HashSet;
+
+// fn get_priority(code: u8) -> u8 {
+//     code % 32 + (26 * (code <= 90) as u8)
+// }
+
+pub fn part_one(_input: &str) -> Option<u32> {
+    // input
+    //     .lines()
+    //     .map(|l| {
+    //         let parts = l.split_at(l.len() / 2);
+    //         // let a: HashSet<&u8> = HashSet::from_iter(parts.0.as_bytes().iter());
+    //         // let b: HashSet<&u8> = HashSet::from_iter(parts.1.as_bytes().iter());
+    //         let a = parts.0.as_bytes();
+    //         let b = parts.1.as_bytes();
+    //         l.len()
+    //     }).sum::<usize>();
     None
 }
 
-pub fn part_two(input: &str) -> Option<u32> {
+pub fn part_two(_input: &str) -> Option<u32> {
     None
 }
 
