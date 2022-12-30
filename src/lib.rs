@@ -41,8 +41,8 @@ macro_rules! solve {
     }};
 }
 
-pub fn run_parser<T>(func: impl Fn(&str) -> T, input: &str) -> T {
-    fn print_result<T>(func: impl FnOnce(&str) -> T, input: &str) -> T {
+pub fn run_parser<'a, T>(func: impl Fn(&'a str) -> T, input: &'a str) -> T {
+    fn print_result<'a, T>(func: impl FnOnce(&'a str) -> T, input: &'a str) -> T {
         let timer = std::time::Instant::now();
         let result = func(input);
         let elapsed = timer.elapsed();
