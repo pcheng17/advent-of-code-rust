@@ -17,9 +17,12 @@ fn main() {
 
             let cmd = Command::new("cargo").args(&args).output().unwrap();
 
-            println!("+----------------------+");
-            println!("|        {}Day {}{}        |", ANSI_BOLD, day, ANSI_RESET);
-            println!("+----------------------+");
+            println!("+--------------------------------------+");
+            println!(
+                "|                {}Day {}{}                |",
+                ANSI_BOLD, day, ANSI_RESET
+            );
+            println!("+--------------------------------------+");
 
             let output = String::from_utf8(cmd.stdout).unwrap();
             let is_empty = output.is_empty();
