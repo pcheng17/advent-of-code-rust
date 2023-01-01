@@ -7,9 +7,9 @@ fn parse(input: &str) -> Vec<char> {
 fn find_marker(chars: &[char], window_size: usize) -> Option<usize> {
     chars
         .windows(window_size)
-        .find_position(|chars| {
-            for (i, x) in chars.iter().enumerate() {
-                for (j, y) in chars.iter().enumerate() {
+        .find_position(|window| {
+            for (i, x) in window.iter().enumerate() {
+                for (j, y) in window.iter().enumerate() {
                     if i != j && x == y {
                         return false;
                     }
@@ -17,7 +17,7 @@ fn find_marker(chars: &[char], window_size: usize) -> Option<usize> {
             }
             true
         })
-        .map(|(pos, _)| pos + window_size)
+        .map(|(i, _)| i + window_size)
 }
 
 pub fn part_one(input: &[char]) -> Option<usize> {
