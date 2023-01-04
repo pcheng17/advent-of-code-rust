@@ -2,11 +2,11 @@ use std::cmp;
 use std::ops::Index;
 
 #[derive(Copy, Clone)]
-enum Resource {
-    Ore = 0,
-    Clay = 1,
-    Obsidian = 2,
-    Geode = 3,
+enum Type {
+    Ore,
+    Clay ,
+    Obsidian,
+    Geode,
 }
 
 pub struct Blueprint {
@@ -21,15 +21,16 @@ struct State {
     time_left: u32,
 }
 
-impl Index<Resource> for [u32; 4] {
+// Allows instances of `Type` to be used as indices into `[u32; 4]`
+impl Index<Type> for [u32; 4] {
     type Output = u32;
 
-    fn index(&self, resource: Resource) -> &Self::Output {
+    fn index(&self, resource: Type) -> &Self::Output {
         match resource {
-            Resource::Ore => &self[0],
-            Resource::Clay => &self[1],
-            Resource::Obsidian => &self[2],
-            Resource::Geode => &self[3],
+            Type::Ore => &self[0],
+            Type::Clay => &self[1],
+            Type::Obsidian => &self[2],
+            Type::Geode => &self[3],
         }
     }
 }
@@ -64,12 +65,25 @@ fn parse(input: &str) -> Vec<Blueprint> {
         .collect()
 }
 
-fn optimistic_best(state: &State, resource: Resource) -> u32 {
+fn optimistic_best(state: &State, resource: Type) -> u32 {
     let t = state.time_left;
     state.resources[resource] + state.robots[resource] * t + (t * (t - 1) / 2)
 }
 
-fn get_max_geodes(blueprint: &Blueprint, state: &State, best: &mut u32) {}
+fn get_max_geodes(blueprint: &Blueprint, state: &State, best: u32) -> u32 {
+    if state.time_left == 1 {
+        return state.resources[Type::Geode] + state.robots[Type::Geode];
+    }
+
+    if optimistic_best(state, Type::Geode) < best {
+        return 0;
+    }
+
+    let mut new_state = *state;
+    new_state.time_left -= 1;
+
+    return 0;
+}
 
 pub fn part_one(input: &Vec<Blueprint>) -> Option<u32> {
     None
