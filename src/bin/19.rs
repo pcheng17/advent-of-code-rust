@@ -105,8 +105,8 @@ fn parse(input: &str) -> Vec<Blueprint> {
         .collect()
 }
 
-fn optimistic_best(state: &State, rtype: Type) -> u32 {
-    let t = state.time_left;
+fn optimistic_best(state: &State, rtype: Type, time_left: Option<u32>) -> u32 {
+    let t = time_left.unwrap_or(state.time_left);
     state.resources[rtype as usize] + state.robots[rtype as usize] * t + (t * (t - 1) / 2)
 }
 
@@ -122,42 +122,35 @@ fn simulate(blueprint: &Blueprint, time_left: u32) -> u32 {
 fn recurse(
     blueprint: &Blueprint,
     state: &State,
-    skipped: Option<&[bool; 3]>,
+    skipped: Option<[bool; 4]>,
     curr_best: u32,
 ) -> u32 {
+    // If we have at most one minute left, then we know how much geode we can produce.
     if state.time_left <= 1 {
         return state.resources[Type::Geode as usize] + state.robots[Type::Geode as usize];
     }
 
-    if optimistic_best(state, Type::Geode) < curr_best {
+    // If the optimistic best of the current minute is worse than the current best,
+    // then we can stop searching this branch.
+    if optimistic_best(state, Type::Geode, None) < curr_best {
         return 0;
     }
 
-    // if state.can_fund(blueprint, Type::Geode) {
-    //     if state.can_build(blueprint, Type::Geode) {
-    //         return optimistic_best(state, Type::Geode);
-    //     } else {
-    //         let mut next_state = *state;
-    //         next_state.gather();
-    //         next_state.time_left -= 1;
-    //         return optimistic_best(&next_state, Type::Geode);
-    //     }
-    // }
-
-    let mut can_build = [false; 3];
-    let mut best = curr_best;
-
-    // If we can build a geode robot, do it.
-    if state.can_build(blueprint, Type::Geode) {
-        let mut next_state = *state;
-        next_state.gather();
-        next_state.build(blueprint, Type::Geode);
-        next_state.time_left -= 1;
-        let score = recurse(blueprint, &next_state, None, best);
-        best = std::cmp::max(score, best);
+    // If we have at least three minutes left, and our optimistic best for obsidian
+    // production by two minutes remaining is not enough to purchase another geode
+    // robot, then we know how much geode we can produce.
+    if state.time_left >= 3
+        && optimistic_best(state, Type::Obsidian, Some(state.time_left - 2))
+            < blueprint.costs[Type::Geode as usize][2]
+    {
+        return state.resources[Type::Geode as usize]
+            + state.time_left * state.robots[Type::Geode as usize];
     }
 
-    for rtype in [Type::Obsidian, Type::Clay, Type::Ore] {
+    let mut can_build = [false; 4];
+    let mut best = curr_best;
+
+    for rtype in [Type::Geode, Type::Obsidian, Type::Clay, Type::Ore] {
         if (skipped.is_none() || !skipped.unwrap()[rtype as usize])
             && state.can_build(blueprint, rtype)
         {
@@ -174,7 +167,7 @@ fn recurse(
     let mut next_state = *state;
     next_state.gather();
     next_state.time_left -= 1;
-    let score = recurse(blueprint, &next_state, Some(&can_build), best);
+    let score = recurse(blueprint, &next_state, Some(can_build), best);
     std::cmp::max(score, best)
 }
 
