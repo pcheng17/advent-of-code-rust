@@ -60,26 +60,12 @@ impl State {
         }
     }
 
-    fn ungather(&mut self) {
-        for (x, y) in self.resources.iter_mut().zip(&self.robots) {
-            *x -= y;
-        }
-    }
-
     fn build(&mut self, blueprint: &Blueprint, rtype: Type) {
         let recipe = &blueprint.costs[rtype as usize];
         for (i, x) in recipe.iter().enumerate() {
             self.resources[i] -= x;
         }
         self.robots[rtype as usize] += 1;
-    }
-
-    fn unbuild(&mut self, blueprint: &Blueprint, rtype: Type) {
-        let recipe = &blueprint.costs[rtype as usize];
-        for (i, x) in recipe.iter().enumerate() {
-            self.resources[i] += x;
-        }
-        self.robots[rtype as usize] -= 1;
     }
 }
 
