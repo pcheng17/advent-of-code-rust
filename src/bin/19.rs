@@ -54,15 +54,15 @@ impl State {
         !maxed && can_afford
     }
 
-    #[allow(dead_code)]
-    fn can_fund(&self, blueprint: &Blueprint, rtype: Type) -> bool {
-        let recipe = &blueprint.costs[rtype as usize];
-        recipe.iter().enumerate().all(|(i, &x)| self.robots[i] >= x)
-    }
-
     fn gather(&mut self) {
         for (x, y) in self.resources.iter_mut().zip(&self.robots) {
             *x += y;
+        }
+    }
+
+    fn ungather(&mut self) {
+        for (x, y) in self.resources.iter_mut().zip(&self.robots) {
+            *x -= y;
         }
     }
 
@@ -72,6 +72,14 @@ impl State {
             self.resources[i] -= x;
         }
         self.robots[rtype as usize] += 1;
+    }
+
+    fn unbuild(&mut self, blueprint: &Blueprint, rtype: Type) {
+        let recipe = &blueprint.costs[rtype as usize];
+        for (i, x) in recipe.iter().enumerate() {
+            self.resources[i] += x;
+        }
+        self.robots[rtype as usize] -= 1;
     }
 }
 
@@ -116,13 +124,13 @@ fn simulate(blueprint: &Blueprint, time_left: u32) -> u32 {
         resources: [0, 0, 0, 0],
         time_left,
     };
-    recurse(blueprint, &state, None, 0)
+    recurse(blueprint, &state, 0, 0)
 }
 
 fn recurse(
     blueprint: &Blueprint,
     state: &State,
-    skipped: Option<[bool; 4]>,
+    skipped: u8,
     curr_best: u32,
 ) -> u32 {
     // If we have at most one minute left, then we know how much geode we can produce.
@@ -147,19 +155,18 @@ fn recurse(
             + state.time_left * state.robots[Type::Geode as usize];
     }
 
-    let mut can_build = [false; 4];
+    let mut can_build: u8 = 0;
     let mut best = curr_best;
 
     for rtype in [Type::Geode, Type::Obsidian, Type::Clay, Type::Ore] {
-        if (skipped.is_none() || !skipped.unwrap()[rtype as usize])
-            && state.can_build(blueprint, rtype)
+        if (skipped & (1 << rtype as usize)) == 0 && state.can_build(blueprint, rtype)
         {
-            can_build[rtype as usize] = true;
+            can_build |= 1 << rtype as usize;
             let mut next_state = *state;
             next_state.gather();
             next_state.build(blueprint, rtype);
             next_state.time_left -= 1;
-            let score = recurse(blueprint, &next_state, None, best);
+            let score = recurse(blueprint, &next_state, 0, best);
             best = std::cmp::max(score, best);
         }
     }
@@ -167,7 +174,7 @@ fn recurse(
     let mut next_state = *state;
     next_state.gather();
     next_state.time_left -= 1;
-    let score = recurse(blueprint, &next_state, Some(can_build), best);
+    let score = recurse(blueprint, &next_state, can_build, best);
     std::cmp::max(score, best)
 }
 
