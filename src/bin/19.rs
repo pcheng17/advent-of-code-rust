@@ -113,12 +113,7 @@ fn simulate(blueprint: &Blueprint, time_left: u32) -> u32 {
     recurse(blueprint, &state, 0, 0)
 }
 
-fn recurse(
-    blueprint: &Blueprint,
-    state: &State,
-    skipped: u8,
-    curr_best: u32,
-) -> u32 {
+fn recurse(blueprint: &Blueprint, state: &State, skipped: u8, curr_best: u32) -> u32 {
     // If we have at most one minute left, then we know how much geode we can produce.
     if state.time_left <= 1 {
         return state.resources[Type::Geode as usize] + state.robots[Type::Geode as usize];
@@ -145,8 +140,7 @@ fn recurse(
     let mut best = curr_best;
 
     for rtype in [Type::Geode, Type::Obsidian, Type::Clay, Type::Ore] {
-        if (skipped & (1 << rtype as usize)) == 0 && state.can_build(blueprint, rtype)
-        {
+        if (skipped & (1 << rtype as usize)) == 0 && state.can_build(blueprint, rtype) {
             can_build |= 1 << rtype as usize;
             let mut next_state = *state;
             next_state.gather();
